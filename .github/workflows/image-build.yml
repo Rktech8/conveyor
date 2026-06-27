@@ -3,7 +3,6 @@ name: GitHub Container Registry Image CI
 on:
   release:
     types: [published]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -20,12 +19,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set lowercase repository name
+        run: echo "IMAGE_REPO=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
-            ghcr.io/${{ github.repository }}
+            ghcr.io/${{ env.IMAGE_REPO }}
           tags: |
             type=schedule
             type=ref,event=branch
@@ -34,9 +36,6 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=sha
-
-      - name: Debug tags output
-        run: echo "${{ steps.meta.outputs.tags }}"      
 
       - name: Prepare variant tags
         id: variants

@@ -74,6 +74,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Deliberately test uppercase rejection
+        run: |
+          docker pull alpine
+          docker tag alpine ghcr.io/${{ github.repository }}:test-fail
+          docker push ghcr.io/${{ github.repository }}:test-fail
 
       - name: Build and push
         uses: docker/build-push-action@v5
